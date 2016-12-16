@@ -1,0 +1,100 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="lks.Mall.WebApp.shared.Site" %>
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>产品列表页 - 我爱模板网 www.5imoban.net</title>
+    <link href="../assets/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+    <link href="../assets/css/main.css" type="text/css" rel="stylesheet" />
+    <link href="../assets/css/base.css" rel="stylesheet" />
+    <script src="../assets/js/jquery.js"></script>
+    <script src="../assets/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <!--header-->
+    <header>
+        <section>品牌官网</section>
+        <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
+
+    </header>
+    <!--/header-->
+    <!--nav-->
+    <nav id="nav-index" class="clearfix">
+        <section class="container">
+            <a href="#" class="fl home">HOME</a>
+            <a href="javascript:;" class="fr button" data-num="0"><i class="glyphicon glyphicon-align-justify"></i></a>
+            <ul class="nav-list">
+                <li><a href="#">双肩包</a></li>
+                <li><a href="#">单肩包</a></li>
+                <li><a href="#">真皮女包</a></li>
+                <li><a href="#">coach女包</a></li>
+                <li><a href="#">手提包</a></li>
+            </ul>
+        </section>
+    </nav>
+    <!--/nav-->
+    <!--main-->
+    <asp:ContentPlaceHolder ID="body" runat="server"></asp:ContentPlaceHolder>
+    <!--/main-->
+    <!--footer-->
+    <footer class="clearfix">
+        <section class="container">
+            <p>Copyright  2006-2015 KORRALAA  HONGKONG COLA TRADING CO.,LIMITED  All Rights Reserved.</p>
+            <p class="mr">
+                <a href="http://www.5imoban.net/" target="_blank" style="color: #ccc;">我爱模板网</a><br>
+                Freephone: +86 400 800 8000<br>
+                HONGKONG COLA TRADING CO.,LIMITED
+                <br>
+                Freephone: +86 400 800 8000
+            </p>
+            <dl>
+                <dt>关于蔻拉</dt>
+                <dd><a href="#">蔻拉文化</a></dd>
+                <dd><a href="#">品牌故事</a></dd>
+            </dl>
+            <dl>
+                <dt>联系我们</dt>
+                <dd><a href="#">蔻拉客服</a></dd>
+                <dd><a href="#">帮助反馈</a></dd>
+                <dd><a href="#">微信公众号</a></dd>
+            </dl>
+            <dl>
+                <dt>产品中心</dt>
+                <dd><a href="#">女包系列</a></dd>
+            </dl>
+        </section>
+    </footer>
+    <!--/footer-->
+    <script>
+        $(function () {
+            $("nav .button").click(function () {
+                var num = $(this).data("num");
+                if (num == 0) {
+                    $("nav .nav-list").slideDown();
+                    $(this).data("num", 1);
+                } else {
+                    $("nav .nav-list").slideUp();
+                    $(this).data("num", 0);
+                }
+            })
+            $(".sidebar dt").click(function () {
+                var wWidth = $(window).width();
+                if (wWidth <= 767) {
+                    $(".sidebar section").hide();
+                }
+                if ($(this).next("section:hidden").length == 0) {
+                    $(this).next("section").slideUp();
+                } else {
+                    $(this).next("section").slideDown();
+                }
+            })
+
+        })
+    </script>
+    <asp:ContentPlaceHolder ID="foot" runat="server"></asp:ContentPlaceHolder>
+</body>
+</html>
