@@ -79,6 +79,7 @@ namespace lks.Mall.BLL
             {
                 if (temp.LoginPwd.Equals(password))
                 {
+                    user = temp;
                     return LoginResult.登录成功;
                 }
                 else

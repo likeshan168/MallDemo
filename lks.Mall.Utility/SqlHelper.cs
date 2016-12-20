@@ -1016,7 +1016,7 @@ namespace lks.Mall.Utility
         }
         #endregion
 
-        public static T MapEntity<T>(SqlDataReader reader) where T : class, new()
+        public static T MapEntity<T>(IDataReader reader) where T : class, new()
         {
             try
             {
@@ -1047,7 +1047,35 @@ namespace lks.Mall.Utility
                 return null;
             }
         }
+        /// <summary>
+        /// 获取指定类型的list
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> GetList<T>(string sql, SqlParameter[] parameters) where T : class, new()
+        {
+            using (IDataReader reader = ExecuteReader(sql, parameters))
+            {
+                while (reader.Read())
+                {
+                    yield return MapEntity<T>(reader);
+                }
+            }
+        }
 
+        /// <summary>
+        /// 获取分页的sql语句
+        /// </summary>
+        /// <param name="table">要查询的表名</param>
+        /// <param name="columns">需要获取的列名</param>
+        /// <param name="index">页码</param>
+        /// <param name="size">一页显示的数目</param>
+        /// <param name="where">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isDesc">是否为降序</param>
+        /// <returns>sql语句</returns>
         public static string GenerateQuerySql(string table, string[] columns, int index, int size, string where, string orderField, bool isDesc = true)
         {
             if (index == 1)

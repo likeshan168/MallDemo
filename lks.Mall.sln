@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lks.Mall.BLL", "lks.Mall.BL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lks.Mall.WebApp", "lks.Mall.WebApp\lks.Mall.WebApp.csproj", "{729889C0-6FAC-453A-BBB9-4067DA6BA298}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lks.Mall.UI", "lks.Mall.UI\lks.Mall.UI.csproj", "{E6E1573E-DCAC-4FD3-9EED-96A855C33F5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{729889C0-6FAC-453A-BBB9-4067DA6BA298}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{729889C0-6FAC-453A-BBB9-4067DA6BA298}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{729889C0-6FAC-453A-BBB9-4067DA6BA298}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6E1573E-DCAC-4FD3-9EED-96A855C33F5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6E1573E-DCAC-4FD3-9EED-96A855C33F5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6E1573E-DCAC-4FD3-9EED-96A855C33F5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6E1573E-DCAC-4FD3-9EED-96A855C33F5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

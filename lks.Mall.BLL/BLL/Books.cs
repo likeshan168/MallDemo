@@ -1,14 +1,16 @@
-﻿using lks.Mall.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using lks.Mall.DAL;
+using lks.Mall.Model;
+using lks.Mall.Utility;
 namespace lks.Mall.BLL
 {
     //Books
     public partial class BooksService
     {
 
-        private readonly lks.Mall.DAL.BooksDAO dal = new lks.Mall.DAL.BooksDAO();
+        private readonly BooksDAO dal = new BooksDAO();
         public BooksService()
         { }
 
@@ -104,17 +106,24 @@ namespace lks.Mall.BLL
         /// <summary>
         /// 获得数据列表
         /// </summary>
-        public List<lks.Mall.Model.Books> GetModelList(string strWhere)
+        public List<Books> GetModelList(string strWhere)
         {
             DataSet ds = dal.GetList(strWhere);
             return DataTableToList(ds.Tables[0]);
         }
+
+        public IEnumerable<Books> GetModelList(int index, int size, string wheres, string orderField, bool isDesc = true)
+        {
+            string sql = SqlHelper.GenerateQuerySql("Books", null, index, size, wheres, "Id", isDesc);
+            return SqlHelper.GetList<Books>(sql, null);
+        }
+
         /// <summary>
         /// 获得数据列表
         /// </summary>
-        public List<lks.Mall.Model.Books> DataTableToList(DataTable dt)
+        public List<Books> DataTableToList(DataTable dt)
         {
-            List<lks.Mall.Model.Books> modelList = new List<lks.Mall.Model.Books>();
+            List<lks.Mall.Model.Books> modelList = new List<Books>();
             int rowsCount = dt.Rows.Count;
             if (rowsCount > 0)
             {

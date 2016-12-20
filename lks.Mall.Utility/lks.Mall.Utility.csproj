@@ -46,7 +46,9 @@
     <Compile Include="CaptchaHelper.cs" />
     <Compile Include="CommandInfo.cs" />
     <Compile Include="ConfigHelper.cs" />
+    <Compile Include="ConverterHelper.cs" />
     <Compile Include="DataCache.cs" />
+    <Compile Include="EncryptHelper.cs" />
     <Compile Include="RequestExt.cs" />
     <Compile Include="SqlHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

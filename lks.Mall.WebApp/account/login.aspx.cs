@@ -9,6 +9,7 @@ namespace lks.Mall.WebApp.account
 {
     public partial class login : Page
     {
+        public string Message = string.Empty;
         private UsersService _service;
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -28,15 +29,19 @@ namespace lks.Mall.WebApp.account
             //2.验证用户名，密码以及验证码
             if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(password))
             {
-                Response.Write("用户名和密码不能为空");
-                Response.End();
+                //Response.Write("用户名和密码不能为空");
+                //Response.End();
+                Message = "用户名和密码不能为空";
+
                 return;
             }
             object scode = Session["user_vcode"];
             if (scode == null || !scode.ToString().Equals(vcode, StringComparison.InvariantCultureIgnoreCase))
             {
-                Response.Write("验证码不正确");
-                Response.End();
+                //Response.Write("验证码不正确");
+                //Response.End();
+
+                Message = "验证码不正确";
                 return;
             }
             //3.调用业务逻辑验证用户名和密码是否正确
@@ -44,8 +49,33 @@ namespace lks.Mall.WebApp.account
             Users user;
             LoginResult rst = _service.Login(userName, password, out user);
             //4.根据验证结果返回给客户端
-            Response.Write(rst.ToString());
-            Response.End();
+            switch (rst)
+            {
+                case LoginResult.登录成功:
+                    if (!string.IsNullOrWhiteSpace(rememberMe))
+                    {
+                        HttpCookie cuser = new HttpCookie("uid", userName) { Expires = DateTime.Now.AddDays(7) };
+                        HttpCookie cpwd = new HttpCookie("pwd", password) { Expires = DateTime.Now.AddDays(7) };
+                        Response.Cookies.Add(cuser);
+                        Response.Cookies.Add(cpwd);
+                    }
+                    string returnUrl = Request[QueryStrKey.ReturnUrl];
+                    if (string.IsNullOrWhiteSpace(returnUrl))
+                    {
+                        returnUrl = "/";
+                    }
+                    Session[SessionKeys.CurrentUser] = user;
+                    Response.Redirect(returnUrl);
+                    return;
+                case LoginResult.用户名不存在:
+                case LoginResult.密码错误:
+                    Message = "用户名或密码错误";
+                    break;
+                case LoginResult.用户名异常:
+                    Message = "用户名或密码错误";
+                    break;
+            }
+
         }
     }
 }
