@@ -35,46 +35,20 @@ namespace lks.Mall.Utility
         public static bool ColumnExists(string tableName, string columnName)
         {
             string sql = "select count(1) from syscolumns where [id]=object_id('" + tableName + "') and [name]='" + columnName + "'";
-            object res = GetSingle(sql);
-            if (res == null)
-            {
-                return false;
-            }
-            return Convert.ToInt32(res) > 0;
+            int res = ExecuteScalar<int>(sql);
+            return res > 0;
+           
         }
         public static int GetMaxID(string FieldName, string TableName)
         {
             string strsql = "select max(" + FieldName + ")+1 from " + TableName;
-            object obj = GetSingle(strsql);
-            if (obj == null)
-            {
-                return 1;
-            }
-            else
-            {
-                return int.Parse(obj.ToString());
-            }
+            int obj = ExecuteScalar<int>(strsql);
+            return obj == 0 ? 1 : obj;
         }
         public static bool Exists(string strSql)
         {
-            object obj = GetSingle(strSql);
-            int cmdresult;
-            if ((Object.Equals(obj, null)) || (Object.Equals(obj, System.DBNull.Value)))
-            {
-                cmdresult = 0;
-            }
-            else
-            {
-                cmdresult = int.Parse(obj.ToString());
-            }
-            if (cmdresult == 0)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            int obj = ExecuteScalar<int>(strSql);
+            return obj == 0 ? false : true;
         }
         /// <summary>
         /// 表是否存在
@@ -85,24 +59,8 @@ namespace lks.Mall.Utility
         {
             string strsql = "select count(*) from sysobjects where id = object_id(N'[" + TableName + "]') and OBJECTPROPERTY(id, N'IsUserTable') = 1";
             //string strsql = "SELECT count(*) FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[" + TableName + "]') AND type in (N'U')";
-            object obj = GetSingle(strsql);
-            int cmdresult;
-            if ((Object.Equals(obj, null)) || (Object.Equals(obj, System.DBNull.Value)))
-            {
-                cmdresult = 0;
-            }
-            else
-            {
-                cmdresult = int.Parse(obj.ToString());
-            }
-            if (cmdresult == 0)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            int obj = ExecuteScalar<int>(strsql);
+            return obj == 0 ? false : true;
         }
         public static bool Exists(string strSql, params SqlParameter[] cmdParms)
         {
@@ -425,7 +383,7 @@ namespace lks.Mall.Utility
         /// </summary>
         /// <param name="SQLString">计算查询结果语句</param>
         /// <returns>查询结果（object）</returns>
-        public static object GetSingle(string SQLString)
+        public static T ExecuteScalar<T>(string SQLString)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -435,16 +393,16 @@ namespace lks.Mall.Utility
                     {
                         connection.Open();
                         object obj = cmd.ExecuteScalar();
-                        if ((Object.Equals(obj, null)) || (Object.Equals(obj, System.DBNull.Value)))
+                        if ((Equals(obj, null)) || (Equals(obj, DBNull.Value)))
                         {
-                            return null;
+                            return default(T);
                         }
                         else
                         {
-                            return obj;
+                            return (T)obj;
                         }
                     }
-                    catch (System.Data.SqlClient.SqlException e)
+                    catch (SqlException e)
                     {
                         connection.Close();
                         throw e;
@@ -792,7 +750,7 @@ namespace lks.Mall.Utility
                         PrepareCommand(cmd, connection, null, SQLString, cmdParms);
                         object obj = cmd.ExecuteScalar();
                         cmd.Parameters.Clear();
-                        if ((Object.Equals(obj, null)) || (Object.Equals(obj, System.DBNull.Value)))
+                        if ((Object.Equals(obj, null)) || (object.Equals(obj, DBNull.Value)))
                         {
                             return null;
                         }
@@ -801,7 +759,7 @@ namespace lks.Mall.Utility
                             return obj;
                         }
                     }
-                    catch (System.Data.SqlClient.SqlException e)
+                    catch (SqlException e)
                     {
                         throw e;
                     }
@@ -825,16 +783,10 @@ namespace lks.Mall.Utility
                 cmd.Parameters.Clear();
                 return myReader;
             }
-            catch (System.Data.SqlClient.SqlException e)
+            catch (SqlException e)
             {
                 throw e;
             }
-            //			finally
-            //			{
-            //				cmd.Dispose();
-            //				connection.Close();
-            //			}	
-
         }
 
         /// <summary>
@@ -1065,6 +1017,19 @@ namespace lks.Mall.Utility
             }
         }
 
+        public static T QuerySingle<T>(string sql, SqlParameter[] parameters) where T : class, new()
+        {
+            using (IDataReader reader = ExecuteReader(sql, parameters))
+            {
+                if (reader.Read())
+                {
+                    return MapEntity<T>(reader);
+                }
+
+                return default(T);
+            }
+        }
+
         /// <summary>
         /// 获取分页的sql语句
         /// </summary>
@@ -1076,13 +1041,13 @@ namespace lks.Mall.Utility
         /// <param name="orderField">排序字段</param>
         /// <param name="isDesc">是否为降序</param>
         /// <returns>sql语句</returns>
-        public static string GenerateQuerySql(string table, string[] columns, int index, int size, string where, string orderField, bool isDesc = true)
+        public static string GenerateQuerySql(string table, string[] columns, int index, int size, object where, string orderField, bool isDesc = true)
         {
             if (index == 1)
             {
                 return GenerateQuerySql(table, columns, size, where, orderField, isDesc);
             }
-            if (index > 1)
+            if (index < 1)
             {
                 return GenerateQuerySql(table, columns, where, orderField, isDesc);
             }
@@ -1092,21 +1057,35 @@ namespace lks.Mall.Utility
                 throw new ArgumentNullException("orderField");
             }
             string column = columns != null && columns.Any() ? string.Join(",", columns) : "*";
-            return $"select {column} from (select row_number() over(order by [{orderField}] {(isDesc ? "desc" : string.Empty)}) as num, {column} from [{table}] {where}) as tb1 where tb1.num between {(index - 1) * size} and {index * size}";
+            return $"select {column} from (select row_number() over(order by [{orderField}] {(isDesc ? "desc" : string.Empty)}) as num, {column} from [{table}] {GetWhere(where)}) as tb1 where tb1.num between {(index - 1) * size} and {index * size}";
         }
 
-        private static string GenerateQuerySql(string table, string[] columns, string where, string orderField, bool isDesc)
+        private static string GenerateQuerySql(string table, string[] columns, object where, string orderField, bool isDesc)
         {
-            where = string.IsNullOrWhiteSpace(where) ? string.Empty : $"where {where}";
+            //where = string.IsNullOrWhiteSpace(where) ? string.Empty : $"where {where}";
             string column = columns != null && columns.Any() ? string.Join(",", columns) : "*";
-            return $"select {column} from {table} {where} {(string.IsNullOrWhiteSpace(orderField) ? string.Empty : $"order by {orderField}")} {(isDesc && !string.IsNullOrWhiteSpace(orderField) ? "desc" : string.Empty)}";
+            return $"select {column} from {table} {GetWhere(where)} {(string.IsNullOrWhiteSpace(orderField) ? string.Empty : $"order by {orderField}")} {(isDesc && !string.IsNullOrWhiteSpace(orderField) ? "desc" : string.Empty)}";
         }
 
-        private static string GenerateQuerySql(string table, string[] columns, int size, string where, string orderField, bool isDesc)
+        private static string GenerateQuerySql(string table, string[] columns, int size, object where, string orderField, bool isDesc)
         {
-            where = string.IsNullOrWhiteSpace(where) ? string.Empty : $"where {where}";
             string column = columns != null && columns.Any() ? string.Join(",", columns) : "*";
-            return $"select top {size} {column} from {table} {where} {(string.IsNullOrWhiteSpace(orderField) ? string.Empty : $"order by {orderField}")} {(isDesc && !string.IsNullOrWhiteSpace(orderField) ? "desc" : string.Empty)}";
+            return $"select top {size} {column} from {table} {GetWhere(where)} {(string.IsNullOrWhiteSpace(orderField) ? string.Empty : $"order by {orderField}")} {(isDesc && !string.IsNullOrWhiteSpace(orderField) ? "desc" : string.Empty)}";
+        }
+
+        public static string GetWhere(object where)
+        {
+            string ws = string.Empty;
+            if (where != null)
+            {
+                ws = "where ";
+                Type w = where.GetType();
+                foreach (var item in w.GetProperties())
+                {
+                    ws += $"{item.Name}={item.GetValue(where)} and ";
+                }
+            }
+            return ws.Substring(0, ws.Length - 5);
         }
     }
 }

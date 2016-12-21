@@ -106,16 +106,41 @@ namespace lks.Mall.BLL
         /// <summary>
         /// 获得数据列表
         /// </summary>
-        public List<Books> GetModelList(string strWhere)
+        public List<Books> QueryList(string strWhere)
         {
             DataSet ds = dal.GetList(strWhere);
             return DataTableToList(ds.Tables[0]);
         }
-
-        public IEnumerable<Books> GetModelList(int index, int size, string wheres, string orderField, bool isDesc = true)
+        /// <summary>
+        /// 获取指定页的数据列表
+        /// </summary>
+        /// <param name="index">页码</param>
+        /// <param name="size">每一页显示的条数</param>
+        /// <param name="wheres">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isDesc">是否降序</param>
+        /// <returns>数据列表</returns>
+        public IEnumerable<Books> QueryList(int index, int size, object wheres, string orderField, bool isDesc = true)
         {
-            string sql = SqlHelper.GenerateQuerySql("Books", null, index, size, wheres, "Id", isDesc);
-            return SqlHelper.GetList<Books>(sql, null);
+            return dal.QueryList(index, size, wheres, orderField, isDesc);
+        }
+        /// <summary>
+        /// 查询单条数据
+        /// </summary>
+        /// <param name="wheres">查询条件</param>
+        /// <returns>单条数据项</returns>
+        public Books QuerySingle(object wheres)
+        {
+            return dal.QuerySingle(wheres);
+        }
+        /// <summary>
+        /// 查询总数
+        /// </summary>
+        /// <param name="wheres">查询条件</param>
+        /// <returns>总数目</returns>
+        public int QueryCount(object wheres)
+        {
+            return dal.QueryCount(wheres);
         }
 
         /// <summary>
@@ -123,11 +148,11 @@ namespace lks.Mall.BLL
         /// </summary>
         public List<Books> DataTableToList(DataTable dt)
         {
-            List<lks.Mall.Model.Books> modelList = new List<Books>();
+            List<Books> modelList = new List<Books>();
             int rowsCount = dt.Rows.Count;
             if (rowsCount > 0)
             {
-                lks.Mall.Model.Books model;
+                Books model;
                 for (int n = 0; n < rowsCount; n++)
                 {
                     model = new lks.Mall.Model.Books();

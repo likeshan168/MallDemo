@@ -6,7 +6,8 @@
     <div class="row clearfix">
         <div class="col-md-12 column">
             <%foreach (var book in BookList)
-                {%>
+            {%>
+            
             <div class="col-md-3">
                 <div class="thumbnail">
                     <img alt="300x200" width="300" height="200" src="/content/BookCovers/<%=book.ISBN %>.jpg" />
@@ -29,6 +30,33 @@
         </div>
 
     </div>
+    <div class="pull-right">
+        <%=PagerHelper.RenderPager("list.aspx?page=@&cat="+CurrentCategory.Id,TotalPages,CurrentPage) %>
+        <%--<ul class="pagination">
+				<li>
+					 <a href="#">Prev</a>
+				</li>
+				<li>
+					 <a href="#">1</a>
+				</li>
+				<li>
+					 <a href="#">2</a>
+				</li>
+				<li>
+					 <a href="#">3</a>
+				</li>
+				<li>
+					 <a href="#">4</a>
+				</li>
+				<li>
+					 <a href="#">5</a>
+				</li>
+				<li>
+					 <a href="#">Next</a>
+				</li>
+			</ul>--%>
+    </div>
+
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="foot" runat="server">
 </asp:Content>

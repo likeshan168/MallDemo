@@ -2,6 +2,8 @@
 using System.Text;
 using System.Data.SqlClient;
 using System.Data;
+using System.Collections.Generic;
+using lks.Mall.Model;
 using lks.Mall.Utility;
 
 namespace lks.Mall.DAL
@@ -33,7 +35,7 @@ namespace lks.Mall.DAL
         /// <summary>
         /// 增加一条数据
         /// </summary>
-        public int Add(lks.Mall.Model.Books model)
+        public int Add(Books model)
         {
             StringBuilder strSql = new StringBuilder();
             strSql.Append("insert into Books(");
@@ -91,7 +93,7 @@ namespace lks.Mall.DAL
         /// <summary>
         /// 更新一条数据
         /// </summary>
-        public bool Update(lks.Mall.Model.Books model)
+        public bool Update(Books model)
         {
             StringBuilder strSql = new StringBuilder();
             strSql.Append("update Books set ");
@@ -303,6 +305,41 @@ namespace lks.Mall.DAL
             return SqlHelper.Query(strSql.ToString());
         }
 
+        /// <summary>
+        /// 获取指定页的数据列表
+        /// </summary>
+        /// <param name="index">页码</param>
+        /// <param name="size">每一页显示的条数</param>
+        /// <param name="wheres">查询条件</param>
+        /// <param name="orderField">排序字段</param>
+        /// <param name="isDesc">是否降序</param>
+        /// <returns>数据列表</returns>
+        public IEnumerable<Books> QueryList(int index, int size, object wheres, string orderField, bool isDesc = true)
+        {
+            string sql = SqlHelper.GenerateQuerySql("Books", null, index, size, wheres, orderField, isDesc);
+            return SqlHelper.GetList<Books>(sql, null);
+        }
+        /// <summary>
+        /// 根据条件获取单条数据
+        /// </summary>
+        /// <param name="wheres">查询条件</param>
+        /// <returns>指定条件的数据</returns>
+        public Books QuerySingle(object wheres)
+        {
+            string sql = SqlHelper.GenerateQuerySql("Books", null, 1, 1, wheres, "Id");
+            return SqlHelper.QuerySingle<Books>(sql, null);
+        }
+        /// <summary>
+        /// 获取总条数
+        /// </summary>
+        /// <param name="wheres">查询条件</param>
+        /// <returns>返回条数</returns>
+        public int QueryCount(object wheres)
+        {
+            string where = SqlHelper.GetWhere(wheres);
+            string sql = $"select count(Id) from Books {where}";
+            return SqlHelper.ExecuteScalar<int>(sql);
+        }
 
     }
 }

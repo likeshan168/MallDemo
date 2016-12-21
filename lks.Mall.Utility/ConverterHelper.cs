@@ -62,7 +62,28 @@ namespace System
 
                 return def;
             }
-        } 
+        }
         #endregion
+
+        public static float ToFloat(this string str, float def = default(float))
+        {
+            try
+            {
+                float rst;
+                if (float.TryParse(str, out rst))
+                {
+                    return rst;
+                }
+                else
+                {
+                    return def;
+                }
+            }
+            catch
+            {
+
+                return def;
+            }
+        }
     }
 }
